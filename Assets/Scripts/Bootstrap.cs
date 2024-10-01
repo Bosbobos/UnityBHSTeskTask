@@ -1,21 +1,24 @@
 using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static System.Net.WebRequestMethods;
 
 public class Bootstrap : MonoBehaviour
 {
-    [SerializeField] private string imageUrl = "https://cdn.pixabay.com/photo/2013/07/19/00/18/tiger-165189_1280.jpg";
+    [SerializeField] private string imageUrl = "https://i.pinimg.com/736x/50/22/6c/50226c989185196b4aa590841dfb21fa.jpg";
     [SerializeField] private SpriteRenderer imageFromURL;
     [SerializeField] private SpriteRenderer imageFromResources;
     [SerializeField] private Button sceneLoadButton;
     [SerializeField] private Slider webProgressBar;
     [SerializeField] private Slider resourcesProgressBar;
     [SerializeField] private Slider sceneProgressBar;
+    [SerializeField] private SceneAsset nextScene;
+
+    private AsyncOperation _loadOperation;
 
     private void Start()
     {
@@ -34,10 +37,12 @@ public class Bootstrap : MonoBehaviour
         // Загрузка изображения из папки Resources
         await LoadImageFromResourcesAsync("initial_image", imageFromResources);
 
+        await LoadSceneAsync(nextScene.name);
+
         // Подписка на кнопку для загрузки сцены
-        sceneLoadButton.onClick.AddListener(async () =>
+        sceneLoadButton.onClick.AddListener(() =>
         {
-            await LoadSceneAsync("SecondScene");
+            ActivateScene();
         });
 
         // Активируем кнопку после всех загрузок
@@ -99,18 +104,23 @@ public class Bootstrap : MonoBehaviour
 
     private async UniTask LoadSceneAsync(string sceneName)
     {
-        var loadOperation = SceneManager.LoadSceneAsync(sceneName);
-        loadOperation.allowSceneActivation = false;
+        _loadOperation = SceneManager.LoadSceneAsync(sceneName);
+        _loadOperation.allowSceneActivation = false;
 
-        while (loadOperation.progress < 0.9f)
+        while (_loadOperation.progress < 0.9f)
         {
             // Обновление прогресс-бара
-            sceneProgressBar.value = loadOperation.progress;
+            sceneProgressBar.value = _loadOperation.progress;
             await UniTask.Yield();
         }
 
         // Сцена готова к активации
         sceneProgressBar.value = 1.0f;
-        loadOperation.allowSceneActivation = true;
+    }
+
+    private void ActivateScene()
+    {
+        _loadOperation.allowSceneActivation = true;
+        _loadOperation = null;
     }
 }
