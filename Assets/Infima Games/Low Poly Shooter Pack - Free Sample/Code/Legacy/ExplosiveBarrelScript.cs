@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ExplosiveBarrelScript : MonoBehaviour {
+public class ExplosiveBarrelScript : MonoBehaviour, IHaveProjectileReaction {
 
 	float randomTime;
 	bool routineStarted = false;
@@ -97,4 +97,9 @@ public class ExplosiveBarrelScript : MonoBehaviour {
 		//Destroy the current barrel object
 		Destroy (gameObject);
 	}
+
+    public void React(Collision collision)
+    {
+		explode = true;
+    }
 }

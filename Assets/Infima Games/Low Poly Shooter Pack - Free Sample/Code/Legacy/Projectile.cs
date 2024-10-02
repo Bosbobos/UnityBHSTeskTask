@@ -99,8 +99,8 @@ public class Projectile : MonoBehaviour {
 			Destroy(gameObject);
 		}
 
-		//If bullet collides with "Concrete" tag
-		if (collision.transform.tag == "Concrete") 
+        //If bullet collides with "Concrete" tag
+        if (collision.transform.tag == "Concrete") 
 		{
 			//Instantiate random impact prefab from array
 			Instantiate (concreteImpactPrefabs [Random.Range 
@@ -110,36 +110,13 @@ public class Projectile : MonoBehaviour {
 			Destroy(gameObject);
 		}
 
-		//If bullet collides with "Target" tag
-		if (collision.transform.tag == "Target") 
-		{
-			//Toggle "isHit" on target object
-			collision.transform.gameObject.GetComponent
-				<TargetScript>().isHit = true;
-			//Destroy bullet object
-			Destroy(gameObject);
-		}
-			
-		//If bullet collides with "ExplosiveBarrel" tag
-		if (collision.transform.tag == "ExplosiveBarrel") 
-		{
-			//Toggle "explode" on explosive barrel object
-			collision.transform.gameObject.GetComponent
-				<ExplosiveBarrelScript>().explode = true;
-			//Destroy bullet object
-			Destroy(gameObject);
-		}
-
-		//If bullet collides with "GasTank" tag
-		if (collision.transform.tag == "GasTank") 
-		{
-			//Toggle "isHit" on gas tank object
-			collision.transform.gameObject.GetComponent
-				<GasTankScript> ().isHit = true;
-			//Destroy bullet object
-			Destroy(gameObject);
-		}
-	}
+        var reactionComponent = collision.gameObject.GetComponent<IHaveProjectileReaction>();
+        if (reactionComponent != null)
+        {
+            reactionComponent.React(collision);
+            Destroy(gameObject);
+        }
+    }
 
 	private IEnumerator DestroyTimer () 
 	{

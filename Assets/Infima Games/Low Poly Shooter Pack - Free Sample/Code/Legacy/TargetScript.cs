@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TargetScript : MonoBehaviour {
+public class TargetScript : MonoBehaviour, IHaveProjectileReaction {
 
 	float randomTime;
 	bool routineStarted = false;
@@ -66,4 +66,9 @@ public class TargetScript : MonoBehaviour {
 		isHit = false;
 		routineStarted = false;
 	}
+
+    public void React(Collision collision)
+    {
+        isHit = true;
+    }
 }

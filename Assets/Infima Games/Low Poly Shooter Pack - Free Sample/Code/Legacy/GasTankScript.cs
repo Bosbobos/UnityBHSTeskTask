@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GasTankScript : MonoBehaviour {
+public class GasTankScript : MonoBehaviour, IHaveProjectileReaction {
 
 	float randomRotationValue;
 	float randomValue;
@@ -151,4 +151,9 @@ public class GasTankScript : MonoBehaviour {
 		//Destroy the current gas tank object
 		Destroy (gameObject);
 	}
+
+    public void React(Collision collision)
+    {
+		isHit = true;
+    }
 }
