@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,10 +14,18 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private SpriteRenderer imageFromURL;
     [SerializeField] private SpriteRenderer imageFromResources;
     [SerializeField] private Button sceneLoadButton;
+
+    [SerializeField] private TextMeshProUGUI webProgressText; 
     [SerializeField] private Slider webProgressBar;
+
+    [SerializeField] private TextMeshProUGUI resourcesProgressText;
     [SerializeField] private Slider resourcesProgressBar;
+
+    [SerializeField] private TextMeshProUGUI sceneProgressText;
     [SerializeField] private Slider sceneProgressBar;
+
     [SerializeField] private SceneAsset nextScene;
+
 
     private AsyncOperation _loadOperation;
 
@@ -57,8 +66,9 @@ public class Bootstrap : MonoBehaviour
 
             while (!operation.isDone)
             {
-                // Обновление прогресс-бара
+                // Обновление прогресс-бара и текста
                 webProgressBar.value = operation.progress;
+                webProgressText.text = $"Загрузка (Web): {Mathf.RoundToInt(operation.progress * 100)}%";
                 await UniTask.Yield();
             }
 
@@ -75,6 +85,9 @@ public class Bootstrap : MonoBehaviour
                 Debug.LogError("Ошибка при загрузке изображения по URL: " + webRequest.error);
             }
         }
+
+        webProgressBar.value = 1.0f;
+        webProgressText.text = "Загрузка (Web): 100%";
     }
 
     private async UniTask LoadImageFromResourcesAsync(string resourceName, SpriteRenderer targetImage)
@@ -83,8 +96,9 @@ public class Bootstrap : MonoBehaviour
 
         while (!resourceRequest.isDone)
         {
-            // Обновление прогресс-бара
+            // Обновление прогресс-бара и текста
             resourcesProgressBar.value = resourceRequest.progress;
+            resourcesProgressText.text = $"Загрузка (Resources): {Mathf.RoundToInt(resourceRequest.progress * 100)}%";
             await UniTask.Yield();
         }
 
@@ -99,7 +113,8 @@ public class Bootstrap : MonoBehaviour
             Debug.LogError("Ошибка при загрузке изображения из Resources.");
         }
 
-        resourcesProgressBar.value = 1f;
+        resourcesProgressBar.value = 1.0f;
+        resourcesProgressText.text = "Загрузка (Resources): 100%";
     }
 
     private async UniTask LoadSceneAsync(string sceneName)
@@ -109,13 +124,14 @@ public class Bootstrap : MonoBehaviour
 
         while (_loadOperation.progress < 0.9f)
         {
-            // Обновление прогресс-бара
+            // Обновление прогресс-бара и текста
             sceneProgressBar.value = _loadOperation.progress;
+            sceneProgressText.text = $"Загрузка сцены: {Mathf.RoundToInt(_loadOperation.progress * 100)}%";
             await UniTask.Yield();
         }
 
-        // Сцена готова к активации
         sceneProgressBar.value = 1.0f;
+        sceneProgressText.text = "Загрузка сцены: 100%";
     }
 
     private void ActivateScene()
